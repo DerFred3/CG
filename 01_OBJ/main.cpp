@@ -9,34 +9,11 @@ public:
   
   MyGLApp() : GLApp{640,480,1,"Shared vertices to explicit representation demo"} {}
   
+  int16_t selection;
+
   virtual void init() override {
-    GL(glDisable(GL_CULL_FACE));
-    GL(glEnable(GL_DEPTH_TEST));
-    GL(glClearColor(0,0,0,0));
-
-    const OBJFile m{"bunny.obj", true};
-
-    // TODO:
-    // Replace this example block of code  by your code to
-    // convert the shared vertex representation in the object m
-    // by an explicit representation, indices are stored in
-    // the stl-vector m.indices the vertex positions are stored
-    // in m.vertices and the normals are stored in m.normals.
-    // As color you can choose whatever you like
-    
-    data.push_back(0.0f); data.push_back(0.5f); data.push_back(0.0f);  // position
-    data.push_back(1.0f); data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f); // color
-    data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f); // normal
-
-    data.push_back(-0.5f); data.push_back(-0.5f); data.push_back(0.0f);
-    data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f); data.push_back(1.0f);
-    data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
-
-    data.push_back(0.5f); data.push_back(-0.5f); data.push_back(0.0f);
-    data.push_back(0.0f); data.push_back(1.0f); data.push_back(0.0f); data.push_back(1.0f);
-    data.push_back(0.0f); data.push_back(0.0f); data.push_back(1.0f);
-
-    // example block end
+    loadBunny();
+    selection = 0;
   }
   
   virtual void animate(double animationTime) override {
@@ -51,9 +28,48 @@ public:
   }
   
   virtual void keyboardChar(unsigned int key) override {
-    // TODO check for keystrokes here
+    // 32 = spacebar
+    if (key != 32) {
+       return;
+    }
+    if (selection % 2 == 0) {
+       loadCube();
+    }
+    else {
+       loadBunny();
+    }
+    selection++;
   }
 
+  void loadBunny() {
+      loadObject("bunny.obj");
+  }
+
+  void loadCube() {
+      loadObject("cube.obj");
+  }
+
+  void loadObject(const char *objectName) {
+      GL(glDisable(GL_CULL_FACE));
+      GL(glEnable(GL_DEPTH_TEST));
+      GL(glClearColor(0,0,0,0));
+      data.clear();
+
+      const OBJFile m{objectName, true};
+
+      for (size_t i = 0; i < m.indices.size(); i++) {
+          for (size_t idx_triangle = 0; idx_triangle < 3; idx_triangle++) {
+              for (size_t idx_vert = 0; idx_vert < 3; idx_vert++) {
+                  data.push_back(m.vertices[m.indices[i][idx_triangle]][idx_vert]);
+              }
+              // Just white
+              data.push_back(1.0f); data.push_back(1.0f); data.push_back(1.0f); data.push_back(1.0f);
+              for (size_t idx_norm = 0; idx_norm < 3; idx_norm++) {
+                  data.push_back(m.normals[m.indices[i][idx_triangle]][idx_norm]); 
+              }
+          }
+      }
+  }
 
 } myApp;
 
