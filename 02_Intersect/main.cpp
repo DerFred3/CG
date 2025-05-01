@@ -22,8 +22,25 @@ public:
     // If the function works correctly, you should
     // see a glossy red sphere, illuminated from
     // the top front
+    // Refer to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+    const Vec3 direction = Vec3::normalize(pixelPos - rayOrigin);
+    const Vec3 rayToCenter = sphereCenter - rayOrigin;
+    const float distanceToCenter = rayToCenter.length();
+    const float rayOrigDistPerpCenter = Vec3::dot(rayToCenter, direction);
+    const float perpDistToDirection = sqrt(pow(distanceToCenter, 2) - pow(rayOrigDistPerpCenter, 2));
+
+    // Ray misses sphere
+    if (perpDistToDirection > radius) {
+      return {};
+    }
+
+    const float distIntersectToPerpCenter = sqrt(pow(radius, 2) - pow(perpDistToDirection, 2));
+    const float t0 = rayOrigDistPerpCenter - distIntersectToPerpCenter;
     
-    return {};
+    return rayOrigin + direction * t0;
+
+    // Only first intersection is needed
+    // const float t1 = t0 + 2 * distIntersectToPerpCenter;
   }
   
   Vec3 computeLighting(const Vec3& rayOrigin, const Vec3& lightPos, const Vec3& intersectionPoint, const Vec3& normal,
