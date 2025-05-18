@@ -34,34 +34,20 @@ public:
     for (size_t i = 0;i<=maxLineSegments;++i) {
      const float t = float(i)/float(maxLineSegments);
 
-      // TODO:
-      // complete the function drawPolySegment
-      // this function takes as argument the
-      // geometry matrix of the polygon method
-      // i.e. hermite, bezier, or b-spline
-      // and draws the polygonal curve as a
-      // line strip, the curve is given as
-      // five paramters, i.e. the four control
-      // points (or, in case of the hermite
-      // curve two points and two derivative
-      // vectors), the geometry matrix, and the
-      // color of the curve. The result should
-      // be written into the the vector curve
-      // the format is x,y,z,r,g,b,a for each
-      // point along the line
-      // The result will be three curves, a
-      // Hermite curve on the top, a Bezier
-      // curve in the middle and a B-Spline
-      // at the bottom
-      
-      curve[i*7+0] = 0.0f;  // x
-      curve[i*7+1] = 0.0f;  // y
+      Vec4 x = Vec4{p0.x, p1.x, p2.x, p3.x};
+      Vec4 y = {p0.y, p1.y, p2.y, p3.y};
+
+      Vec4 xResult = Vec4{1, t, t * t, t * t * t} * (g * x);
+      Vec4 yResult = Vec4{1, t, t * t, t * t * t} * (g * y);
+
+      curve[i*7+0] = xResult[0] + xResult[1] + xResult[2] + xResult[3];  // x
+      curve[i*7+1] = yResult[0] + yResult[1] + yResult[2] + yResult[3];  // y
       curve[i*7+2] = 0.0f;  // z  (no need to change)
       
-      curve[i*7+3] = 0.0f;  // red
-      curve[i*7+4] = 0.0f;  // green
-      curve[i*7+5] = 0.0f;  // blue
-      curve[i*7+6] = 0.0f;  // alpha
+      curve[i*7+3] = color.r;  // red
+      curve[i*7+4] = color.g;  // green
+      curve[i*7+5] = color.b;  // blue
+      curve[i*7+6] = color.a;  // alpha
     }
     drawLines(curve, LineDrawType::STRIP, 3);
   }
@@ -80,11 +66,33 @@ public:
                p1.x+m1.x,p1.y-m1.y,0,0,0,1,1,
                p1.x,p1.y,0,1,0,0,1}, 20, true);
   }
-  
+
   void drawBezierSegmentDeCasteljau(const Vec2& p0, const Vec2& p1,
                                     const Vec2& p2, const Vec2& p3,
                                     const Vec4& color) {
     // TODO SOLUTION 2:
+    /*
+    (1 − t) ⋅ ((1 − t) ⋅ ((1 − t) ⋅ p0 + t ⋅ p1) + t ⋅ ((1 − t) ⋅ p1 + t ⋅ p2))+
+    t ⋅ ((1 − t) ⋅ ((1 − t) ⋅ p1 + t ⋅ p2) + t ⋅ ((1 − t) ⋅ p2 + t ⋅ p3))
+    */
+    std::vector<float> curve((maxLineSegments+1)*7);
+    
+    for (size_t i = 0;i<=maxLineSegments;++i) {
+     const float t = float(i)/float(maxLineSegments);
+
+      // SUGGESTION: Add <float * Vec2> as possible order for operator*
+      Vec2 resultPoint = (1 - t) * ((1 - t) * ((1 - t) * p0 + t * p1) + t * ((1 - t) * p1 + t * p2)) + t * ((1 - t) * ((1 - t) * p1 + t * p2) + t * ((1 - t) * p2 + t * p3));
+
+      curve[i*7+0] = 0.0f;  // x
+      curve[i*7+1] = 0.0f;  // y
+      curve[i*7+2] = 0.0f;  // z  (no need to change)
+      
+      curve[i*7+3] = color.r;  // red
+      curve[i*7+4] = color.g;  // green
+      curve[i*7+5] = color.b;  // blue
+      curve[i*7+6] = color.a;  // alpha
+    }
+    drawLines(curve, LineDrawType::STRIP, 3);
   }
 
   void drawBezierSegment(const Vec2& p0, const Vec2& p1, const Vec2& p2,
