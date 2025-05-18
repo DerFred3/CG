@@ -49,4 +49,5 @@ bin
 tmp
 
 */.vscode
+.vscode
 */*.zip
