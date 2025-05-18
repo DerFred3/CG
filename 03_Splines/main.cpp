@@ -83,8 +83,8 @@ public:
       // SUGGESTION: Add <float * Vec2> as possible order for operator*
       Vec2 resultPoint = (1 - t) * ((1 - t) * ((1 - t) * p0 + t * p1) + t * ((1 - t) * p1 + t * p2)) + t * ((1 - t) * ((1 - t) * p1 + t * p2) + t * ((1 - t) * p2 + t * p3));
 
-      curve[i*7+0] = 0.0f;  // x
-      curve[i*7+1] = 0.0f;  // y
+      curve[i*7+0] = resultPoint.x;  // x
+      curve[i*7+1] = resultPoint.y;  // y
       curve[i*7+2] = 0.0f;  // z  (no need to change)
       
       curve[i*7+3] = color.r;  // red
