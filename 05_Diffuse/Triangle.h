@@ -11,5 +11,13 @@ public:
 
 private:
   // TODO: add the appropriate member variables here
+  Vertex const *m_v0;
+  Vertex const *m_v1;
+  Vertex const *m_v2;
+  Shader const *m_shader;
+  float m_area;
 
+  bool is_inside(const Vec3& v, float& a, float& b, float& c);
 };
+
+float area(Vec3 p1, Vec3 p2, Vec3 p3);

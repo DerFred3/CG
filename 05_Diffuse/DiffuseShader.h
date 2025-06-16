@@ -11,5 +11,6 @@ public:
 
 private:
   // TODO: add the appropriate member variables here
-
+  Vec3 m_lightPos;
+  Vec3 m_lightColor;
 };
