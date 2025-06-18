@@ -23,14 +23,16 @@ void Triangle::draw(Image& image) {
       float &b = *new float(0.0);
       float &c = *new float(0.0);
       if (is_inside(p, a, b, c)) {
-        float valX = (float)x / (float)image.width;
-        float valY = (float)y / (float)image.height;
-        
-        Vec3 shade = m_shader->shade(*m_v0) * b + m_shader->shade(*m_v1) * c + m_shader->shade(*m_v2) * a;
+        Vec3 ambient = m_v0->m_Material->color_ambient * b + m_v1->m_Material->color_ambient * c + m_v2->m_Material->color_ambient * a;
+        Vec3 diffuse = m_v0->m_Material->color_diffuse * b + m_v1->m_Material->color_diffuse * c + m_v2->m_Material->color_diffuse * a;
+        Material material = Material(ambient, diffuse, diffuse);
+        Vertex surface = Vertex(Vec3(x, y, 0.0), material, Vec3(0,0,1));
 
-        image.setValue(x, y, 0, shade.r * 255.0);
-        image.setValue(x, y, 1, shade.g * 255.0);
-        image.setValue(x, y, 2, shade.b * 255.0);
+        Vec3 shade = m_shader->shade(surface);
+
+        image.setValue(x, y, 0, shade.r * UINT8_MAX);
+        image.setValue(x, y, 1, shade.g * UINT8_MAX);
+        image.setValue(x, y, 2, shade.b * UINT8_MAX);
       }
     }
   }
